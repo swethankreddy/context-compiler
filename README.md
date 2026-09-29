@@ -32,10 +32,12 @@ Context Compiler is the fixed rope. It reads the session that ended and writes d
 Requires **Node.js 22+**, and the **Claude Code CLI** (`claude`) installed and signed in.
 
 ```sh
-npm install -g github:swethankreddy/context-compiler
+npm install -g --install-links github:swethankreddy/context-compiler
 ```
 
-This installs from source and builds on install. Check it worked:
+The repository ships prebuilt JavaScript, so there is no build step. (`--install-links` makes npm copy the package instead of linking to a temporary clone.) Prefer a file? Each [release](https://github.com/swethankreddy/context-compiler/releases/latest) also has a `context-compiler-<version>.tgz`: `npm install -g ./context-compiler-0.1.0.tgz`.
+
+Check it worked:
 
 ```sh
 ccp --version
@@ -132,7 +134,7 @@ clipboard:
 git clone https://github.com/swethankreddy/context-compiler.git
 cd context-compiler
 npm install
-npm run build
+npm run build   # dist/ is committed; rebuild after changing src/
 npm test
 ```
 
