@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/poster.jpg" alt="Context Compiler leaves the rope." width="100%">
+  <img src="assets/poster.jpg" alt="Context Compiler keeps the lights on." width="100%">
 </p>
 
 <h1 align="center">Context Compiler</h1>
@@ -21,9 +21,9 @@
 ## Why
 
 A long coding session builds up knowledge the repository never keeps: what you asked for, what failed, the decisions made on the way, the exact values that mattered, what was verified and what is still open.
-When the session ends, or is compacted, or hands over to another agent, that knowledge is gone. The next agent sees what was built, not why, and starts again from the bottom.
+Every time your agent works, it builds a map in its head. When the session ends, is compacted, or hands over to another agent, the map goes dark, and the next agent starts in the dark.
 
-Context Compiler is the fixed rope. It reads the session that ended and writes down the route, so the next agent picks up from exactly where the last one stopped.
+Context Compiler keeps the lights on. It reads the session that ended and compiles the map into a handoff, so the next agent sees the map and picks up right where the last one stopped.
 
 <p align="center"><img src="assets/handoff.jpg" alt="The handoff: what's done, what's left, what to watch out for" width="100%"></p>
 
@@ -140,8 +140,8 @@ npm test
 
 ## The film
 
-A short film explains the idea in 40 seconds: *every session is a climb, and Context Compiler leaves the rope.*
-Vertical and horizontal versions are attached to the [latest release](https://github.com/swethankreddy/context-compiler/releases/latest).
+A short film explains the idea in under 40 seconds: *every agent builds a map in its head; Context Compiler keeps the lights on.*
+Watch it on the [latest release](https://github.com/swethankreddy/context-compiler/releases/latest) (`context-compiler-film.mp4`, 1920×1080).
 
 ## License
 
