@@ -1,0 +1,2 @@
+{"kind": "turn", "role": "user", "body": "hello"}
+{"type": "user", "payload": {"text": "hi"}}

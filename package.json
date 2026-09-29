@@ -1,0 +1,54 @@
+{
+  "name": "context-compiler",
+  "version": "0.1.0",
+  "description": "Hand an AI coding agent’s unfinished work to the next agent: a structured handoff compiled from your Claude Code session, git state and tool evidence.",
+  "type": "module",
+  "bin": {
+    "ccp": "dist/cli/index.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "ccp": "node dist/cli/index.js",
+    "eval:selection": "npm run -s build && node dist/evaluation/run-selection.js",
+    "eval:compiler": "npm run -s build && node dist/evaluation/run-compiler.js",
+    "bench": "npm run -s build && node dist/benchmark/run.js",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  },
+  "license": "MIT",
+  "author": "Swethank (https://github.com/swethankreddy)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swethankreddy/context-compiler.git"
+  },
+  "homepage": "https://github.com/swethankreddy/context-compiler#readme",
+  "bugs": {
+    "url": "https://github.com/swethankreddy/context-compiler/issues"
+  },
+  "keywords": [
+    "claude-code",
+    "ai-agents",
+    "handoff",
+    "context",
+    "cli",
+    "developer-tools",
+    "llm"
+  ],
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
+}

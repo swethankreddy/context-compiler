@@ -1,0 +1,26 @@
+{
+  "id": "c2-ledgerline-export-client",
+  "mode": "handoff",
+  "title": "Finish the Ledgerline exports client (dedupe, retries, error classes)",
+  "category": "api",
+  "instruction": "Dana's agent never got to it, can you finish the Ledgerline export client (FIN-418)?",
+  "expectedChanges": ["^src/ledgerClient\\.js$", "^test/"],
+  "facts": [
+    { "name": "overall task: fetchExportRecords pulls every record of a Ledgerline export per the pasted spec", "kind": "objective", "pattern": "fetchExportRecords\\(exportId, options\\)" },
+    { "name": "429: wait exactly Retry-After seconds, up to 5 retries, no backoff", "kind": "constraint", "pattern": "Retry-After.{0,40}up to 5 retries" },
+    { "name": "5xx: backoff 200/400/800 ms, at most 3 retries", "kind": "constraint", "pattern": "200, 400, 800" },
+    { "name": "401/404/400/422 are never retried", "kind": "constraint", "pattern": "401/404 never retry" },
+    { "name": "error class names from the SDK conventions, with requestId from X-Request-Id", "kind": "constraint", "pattern": "LedgerRateLimitError" },
+    { "name": "dedupe records by id across pages, keep first occurrence", "kind": "constraint", "pattern": "de-duplicate by (\")?id" },
+    { "name": "always use limit=200 and pass the cursor back verbatim", "kind": "constraint", "pattern": "limit=200" },
+    { "name": "version header is 2025-03-15, not the doc's value (correction)", "kind": "correction", "pattern": "2025-03-15", "stale": "2024-11-01" },
+    { "name": "stopping on an empty page lost records (1,400 vs 2,013)", "kind": "failed-approach", "pattern": "Stopping on an empty page is wrong" },
+    { "name": "rejected: one shared backoff/retry budget for 429 and 5xx", "kind": "failed-approach", "pattern": "don't lump them together" },
+    { "name": "fetch and sleep are injected options", "kind": "decision", "pattern": "inject both" },
+    { "name": "sandbox rerun fetched 2019 records, 6 more than the dashboard", "kind": "verification", "pattern": "2019 records" },
+    { "name": "dedupe, version header, retries and error classes remain", "kind": "remaining", "pattern": "Not done" },
+    { "name": "next: add dedupe together with the retry work", "kind": "next-step", "pattern": "together with the retry work" },
+    { "name": "Agent A told to stop before retries/error handling", "kind": "previous-agent-scope", "pattern": "don't start it" },
+    { "name": "the tenant's per-minute rate limit (mentioned, never stated)", "kind": "unavailable", "pattern": "per-minute limit (is|of)\\s*\\d+|\\d+\\s*requests? (per|a|/)\\s*min", "invented": "\\b\\d{2,5}\\s*(requests|req|calls)\\s*(per|/|a|an)\\s*(minute|min)\\b" }
+  ]
+}

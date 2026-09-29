@@ -1,0 +1,87 @@
+{
+  "events": [
+    {
+      "user": "FIN-418: we need fetchExportRecords(exportId, options) in src/ledgerClient.js to pull every record of a Ledgerline export. The relevant section of their partner docs is below. Options: baseUrl, token, fetch and sleep (inject both so tests never hit the network or actually wait), plus the onPage callback the sync script already passes. Always ask for the max page size, limit=200. No dependencies, plain fetch.",
+      "pasted": "Ledgerline Exports API — v2 (partner docs, section 4.3 \"Reading export records\")\n\nGET {base}/v2/exports/{export_id}/records\n\nRequired headers\n  Authorization: Bearer <access token>\n  X-Ledgerline-Version: 2024-11-01\n  Accept: application/json\n\nQuery parameters\n  limit   integer, 1-200, default 50. Values above 200 are rejected with 400.\n  cursor  opaque string returned as next_cursor by the previous page. Pass it back\n          exactly as received (URL-encoded). Do not parse or construct cursors.\n\nResponse 200\n  { \"data\": [ { \"id\": \"rec_...\", ... } ], \"next_cursor\": \"...\" | null }\n  The listing is complete only when next_cursor is null. A page may contain zero\n  records while next_cursor is non-null (the export is still being appended);\n  clients MUST keep following the cursor.\n  Because exports are appended while being read, a record may appear on two\n  consecutive pages. Records are immutable; clients should de-duplicate by \"id\",\n  keeping the first occurrence.\n\nErrors and retries\n  401       invalid or expired token. Do not retry.\n  404       unknown export_id. Do not retry.\n  400/422   malformed request. Do not retry.\n  429       rate limited. The response carries Retry-After (integer seconds). Wait\n            exactly that long, then repeat the same request. Up to 5 retries per\n            request; after that surface the error.\n  500, 502, 503, 504\n            transient. Retry the same request with exponential backoff starting\n            at 200 ms and doubling (200, 400, 800). At most 3 retries per request,\n            then surface the error. Do not apply this backoff to 429.\n  Any retry repeats the same cursor; never skip ahead.\n\nError surface (partner SDK conventions)\n  Clients should raise LedgerAuthError for 401, LedgerNotFoundError for 404,\n  LedgerRateLimitError when 429 retries are exhausted, and LedgerHttpError (with\n  .status) for everything else. All errors carry the response's X-Request-Id as\n  .requestId when the header is present."
+    },
+    {
+      "claude": "Plan: implement the cursor loop with the three required headers first, with fetch and sleep injectable as you said (sleep defaults to a setTimeout promise). Once pagination is solid I'll layer the retry rules on top: 429 with Retry-After, 5xx backoff, no retry for 401/404/400/422. Let me look at what's there."
+    },
+    {
+      "read": "src/ledgerClient.js"
+    },
+    {
+      "read": "src/http.js"
+    },
+    {
+      "read": "scripts/sync-export.mjs"
+    },
+    {
+      "claude": "buildUrl in http.js already URL-encodes query values via searchParams, so the cursor goes back verbatim as the docs require. Writing the first version of the client: headers, limit=200, follow next_cursor."
+    },
+    {
+      "write": "src/ledgerClient.js",
+      "content": "// Client for the Ledgerline partner API (exports).\nimport { buildUrl, readJson } from './http.js';\n\nconst PAGE_LIMIT = 200;\n\nexport class LedgerError extends Error {\n  constructor(status, message) {\n    super(message);\n    this.name = 'LedgerError';\n    this.status = status;\n  }\n}\n\nexport async function fetchExportRecords(exportId, options = {}) {\n  const {\n    baseUrl,\n    token,\n    fetch: doFetch = globalThis.fetch,\n    sleep = (ms) => new Promise((r) => setTimeout(r, ms)),\n    onPage = () => {},\n  } = options;\n\n  const headers = {\n    Authorization: `Bearer ${token}`,\n    'X-Ledgerline-Version': '2024-11-01',\n    Accept: 'application/json',\n  };\n\n  const records = [];\n  let cursor;\n  let page = 0;\n  do {\n    const url = buildUrl(baseUrl, `v2/exports/${encodeURIComponent(exportId)}/records`, {\n      limit: PAGE_LIMIT,\n      cursor,\n    });\n    const res = await doFetch(url, { method: 'GET', headers });\n    if (!res.ok) {\n      throw new LedgerError(res.status, `Ledgerline responded ${res.status} for ${url}`);\n    }\n    const body = await readJson(res);\n    page += 1;\n    onPage(page, body.data.length);\n    if (body.data.length === 0) break;\n    records.push(...body.data);\n    cursor = body.next_cursor;\n  } while (cursor);\n\n  return records;\n}\n"
+    },
+    {
+      "write": "test/ledgerClient.test.js",
+      "content": "import { test } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { fetchExportRecords, LedgerError } from '../src/ledgerClient.js';\n\nfunction fakeFetch(pages) {\n  const calls = [];\n  const fn = async (url, init) => {\n    calls.push({ url, init });\n    const next = pages.shift();\n    return new Response(JSON.stringify(next.body), { status: next.status ?? 200 });\n  };\n  fn.calls = calls;\n  return fn;\n}\n\nconst opts = (fetch) => ({ baseUrl: 'https://api.test', token: 'tok', fetch, sleep: async () => {} });\n\ntest('follows next_cursor until null', async () => {\n  const fetch = fakeFetch([\n    { body: { data: [{ id: 'r1' }], next_cursor: 'c1' } },\n    { body: { data: [{ id: 'r2' }], next_cursor: null } },\n  ]);\n  const out = await fetchExportRecords('exp_1', opts(fetch));\n  assert.deepEqual(out.map((r) => r.id), ['r1', 'r2']);\n  assert.match(fetch.calls[1].url, /cursor=c1/);\n});\n\ntest('sends bearer token and limit=200', async () => {\n  const fetch = fakeFetch([{ body: { data: [], next_cursor: null } }]);\n  await fetchExportRecords('exp_1', opts(fetch));\n  assert.equal(fetch.calls[0].init.headers.Authorization, 'Bearer tok');\n  assert.match(fetch.calls[0].url, /limit=200/);\n});\n\ntest('non-2xx surfaces a LedgerError with status', async () => {\n  const fetch = fakeFetch([{ status: 404, body: { error: 'not_found' } }]);\n  await assert.rejects(fetchExportRecords('exp_x', opts(fetch)), (err) => err instanceof LedgerError && err.status === 404);\n});\n"
+    },
+    {
+      "bash": "npm test",
+      "exit": 0,
+      "output": "✔ follows next_cursor until null (3.4ms)\n✔ sends bearer token and limit=200 (0.6ms)\n✔ non-2xx surfaces a LedgerError with status (0.9ms)\nℹ tests 3\nℹ suites 0\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 61.7"
+    },
+    {
+      "user": "I ran it against sandbox export exp_8812. Their dashboard says 2,013 records.",
+      "pasted": "$ LEDGERLINE_TOKEN=... npm run sync -- exp_8812\n\n> finance-sync@0.7.0 sync\n> node scripts/sync-export.mjs exp_8812\n\npage 1: 200 records\npage 2: 200 records\npage 3: 200 records\npage 4: 200 records\npage 5: 200 records\npage 6: 200 records\npage 7: 200 records\npage 8: 0 records\nfetched 1400 records for exp_8812"
+    },
+    {
+      "claude": "That's my bug. I added an early exit when a page comes back empty, as a guard against looping forever, but the docs say an empty page with a non-null next_cursor just means the export is still being appended and the client must keep following the cursor. Page 8 was exactly that case. Stopping on an empty page is wrong; the only end condition is next_cursor === null. Removing the break and adding a test for it."
+    },
+    {
+      "edit": "src/ledgerClient.js",
+      "old": "    onPage(page, body.data.length);\n    if (body.data.length === 0) break;\n",
+      "new": "    onPage(page, body.data.length);\n"
+    },
+    {
+      "edit": "test/ledgerClient.test.js",
+      "old": "test('non-2xx surfaces a LedgerError with status'",
+      "new": "test('keeps following the cursor after an empty page', async () => {\n  const fetch = fakeFetch([\n    { body: { data: [{ id: 'r1' }], next_cursor: 'c1' } },\n    { body: { data: [], next_cursor: 'c2' } },\n    { body: { data: [{ id: 'r2' }], next_cursor: null } },\n  ]);\n  const out = await fetchExportRecords('exp_1', opts(fetch));\n  assert.deepEqual(out.map((r) => r.id), ['r1', 'r2']);\n});\n\ntest('non-2xx surfaces a LedgerError with status'"
+    },
+    {
+      "bash": "npm test",
+      "exit": 0,
+      "output": "✔ follows next_cursor until null (3.1ms)\n✔ sends bearer token and limit=200 (0.5ms)\n✔ keeps following the cursor after an empty page (0.4ms)\n✔ non-2xx surfaces a LedgerError with status (0.8ms)\nℹ tests 4\nℹ pass 4\nℹ fail 0"
+    },
+    {
+      "user": "Reran it: \"fetched 2019 records for exp_8812\". Six more than their dashboard now."
+    },
+    {
+      "claude": "Those six are almost certainly the page-boundary repeats from the docs: while the export is being appended, a record can show up on two consecutive pages. The fix is to de-duplicate by id, keeping the first occurrence. I'll do that together with the retry work, since both touch the loop."
+    },
+    {
+      "user": "OK. Two more things. The X-Ledgerline-Version value in those docs is outdated: their partner engineer emailed this morning and we're pinned to 2025-03-15, use that and not the one in the doc. And about rate limiting: support told me our tenant's per-minute limit on the call yesterday, but I don't think the client needs it since we just honour Retry-After."
+    },
+    {
+      "claude": "Noted: the header becomes X-Ledgerline-Version: 2025-03-15. Agreed on the rate limit, the client only reacts to 429 + Retry-After and doesn't need to pace itself. For retries I'm thinking of one generic helper: any 429 or 5xx goes through the same exponential backoff (200, 400, 800…) with a shared retry budget. That keeps the code small."
+    },
+    {
+      "user": "No, don't lump them together. 429 waits exactly Retry-After seconds, up to 5 retries, and never uses the backoff. 5xx is its own 200/400/800 schedule with 3 retries max. 401/404 never retry, and the error classes have to be the ones from their SDK conventions because the alerting matches on the names."
+    },
+    {
+      "claude": "Understood, two separate policies: 429 means sleep(Retry-After × 1000), max 5 retries, then LedgerRateLimitError. 500/502/503/504 means sleep 200, 400, 800, max 3 retries, then LedgerHttpError with .status. 401 raises LedgerAuthError and 404 raises LedgerNotFoundError immediately. All of them get .requestId from X-Request-Id, and every retry repeats the same cursor."
+    },
+    {
+      "user": "Actually let's stop here. Dana's agent is doing the retry/error part together with the other partner clients this afternoon, so don't start it. Just make sure what you have is green."
+    },
+    {
+      "bash": "npm test",
+      "exit": 0,
+      "output": "✔ follows next_cursor until null (3.0ms)\n✔ sends bearer token and limit=200 (0.5ms)\n✔ keeps following the cursor after an empty page (0.4ms)\n✔ non-2xx surfaces a LedgerError with status (0.8ms)\nℹ tests 4\nℹ pass 4\nℹ fail 0"
+    },
+    {
+      "claude": "Green, stopping here. State of FIN-418:\n\nDone: src/ledgerClient.js follows next_cursor until it is null (empty pages no longer end the listing), sends Authorization/Accept/X-Ledgerline-Version, and uses limit=200 with the cursor passed back verbatim. There are 4 tests in test/ledgerClient.test.js.\n\nNot done:\n- De-duplicate records by id across pages, keeping the first occurrence (the 2,019 vs 2,013 difference).\n- Switch the version header to 2025-03-15. The code still has the value from the docs.\n- Retries: 429 honours Retry-After and 5xx uses the 200/400/800 backoff, with separate budgets as above.\n- Error classes per the SDK conventions (they currently throw a generic LedgerError), with requestId."
+    }
+  ]
+}
