@@ -1,6 +1,8 @@
 <p align="center">
-  <img src="assets/poster.jpg" alt="Context Compiler keeps the lights on." width="100%">
+  <img src="assets/film-map-poster.jpg" alt="Context Compiler keeps the lights on." width="100%">
 </p>
+
+<p align="center"><img src="assets/icon.png" alt="Context Compiler icon" width="120" height="120"></p>
 
 <h1 align="center">Context Compiler</h1>
 
@@ -25,7 +27,7 @@ Every time your agent works, it builds a map in its head. When the session ends,
 
 Context Compiler keeps the lights on. It reads the session that ended and compiles the map into a handoff, so the next agent sees the map and picks up right where the last one stopped.
 
-<p align="center"><img src="assets/handoff.jpg" alt="The handoff: what's done, what's left, what to watch out for" width="100%"></p>
+<p align="center"><img src="assets/film-map-handoff.jpg" alt="The handoff: what's done, what's left, what to watch out for" width="100%"></p>
 
 ## Install
 
