@@ -29,7 +29,7 @@ Context Compiler is the fixed rope. It reads the session that ended and writes d
 
 ## Install
 
-Requires **Node.js 22+**, and the **Claude Code CLI** (`claude`) installed and signed in.
+Requires **macOS**, **Node.js 22+**, and the **Claude Code CLI** (`claude`) installed and signed in.
 
 ```sh
 npm install -g --install-links github:swethankreddy/context-compiler
