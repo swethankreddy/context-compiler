@@ -16,8 +16,7 @@
     "ccp": "node dist/cli/index.js",
     "eval:selection": "npm run -s build && node dist/evaluation/run-selection.js",
     "eval:compiler": "npm run -s build && node dist/evaluation/run-compiler.js",
-    "bench": "npm run -s build && node dist/benchmark/run.js",
-    "prepare": "npm run build"
+    "bench": "npm run -s build && node dist/benchmark/run.js"
   },
   "dependencies": {
     "yaml": "^2.9.1"
