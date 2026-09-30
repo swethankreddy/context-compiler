@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Context Compiler: keep the lights on for the next agent</title>
+<meta name="description" content="ccp compiles your Claude Code session, git state and tool evidence into a structured handoff, so the next AI agent picks up right where the last one stopped. Open source, MIT.">
+<meta property="og:title" content="Context Compiler">
+<meta property="og:description" content="Keep the lights on for the next agent. A handoff compiled from your Claude Code session.">
+<meta property="og:image" content="https://swethankreddy.github.io/context-compiler/media/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0D1012">
+<link rel="icon" href="media/icon.png">
+<link rel="preload" href="fonts/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script src="vendor/gsap/gsap.min.js" defer></script>
+<script src="vendor/gsap/ScrollTrigger.min.js" defer></script>
+<script src="vendor/gsap/SplitText.min.js" defer></script>
+<script src="vendor/gsap/DrawSVGPlugin.min.js" defer></script>
+<script src="vendor/gsap/ScrambleTextPlugin.min.js" defer></script>
+<script type="module" src="main.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<canvas id="map" aria-hidden="true"></canvas>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top"><img src="media/icon.png" alt="" width="36" height="36"><span>Context Compiler</span></a>
+  <nav aria-label="Sections">
+    <a href="#how">How it works</a>
+    <a href="#handoff">The handoff</a>
+    <a href="#film">Film</a>
+    <a class="gh" href="https://github.com/swethankreddy/context-compiler"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+  </nav>
+</header>
+
+<main id="main">
+  <!-- Hero: the living map -->
+  <section class="hero" id="top">
+    <div class="hero-copy">
+      <p class="kicker"><span class="dot"></span>Open source, for Claude Code</p>
+      <h1 class="split">Keep the lights on for the next agent.</h1>
+      <p class="lede">Every coding session builds a map of what matters: what you asked for, what failed, what was decided. <code>ccp</code> compiles that session into a handoff, so the next agent picks up right where the last one stopped.</p>
+      <div class="install" data-copy="npm install -g --install-links github:swethankreddy/context-compiler">
+        <span class="prompt">$</span><code class="cmd">npm install -g --install-links github:swethankreddy/context-compiler</code>
+        <button type="button" class="copy" aria-label="Copy install command">Copy</button>
+      </div>
+      <div class="actions">
+        <a class="btn primary" href="#how">See how it works</a>
+        <a class="btn ghost" href="#film"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Watch the film</a>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- Pinned scroll story: build, dark, relight, compile -->
+  <section class="story" id="story" aria-label="The idea">
+    <div class="story-pin">
+      <ol class="beats">
+        <li class="beat" data-beat="0"><span class="n">01</span><h2>Your agent builds a map as it works.</h2><p>Requirements, corrections, decisions, the tests it ran. It all lives in the session.</p></li>
+        <li class="beat" data-beat="1"><span class="n">02</span><h2>Then the session ends. The map goes dark.</h2><p>Compaction, a new chat, another agent. The code survives. Why it looks that way does not.</p></li>
+        <li class="beat" data-beat="2"><span class="n">03</span><h2>Context Compiler keeps the lights on.</h2><p>It reads the session that ended and compiles the map into a handoff the next agent can act on.</p></li>
+      </ol>
+      <div class="progress" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <!-- How it works: the pipeline with real counts -->
+  <section class="section how" id="how">
+    <div class="wrap">
+      <h2 class="h2 split">Deterministic until the last step.</h2>
+      <p class="sub">The model only writes. Finding, scoring and trimming the evidence is plain code you can inspect with <code>ccp context</code>.</p>
+      <div class="pipeline" role="img" aria-label="On one recorded session: 102 transcript records and 18 tool calls were discovered as 37 candidates, 24 were selected within the budget and redacted, the isolated compile call read 25,891 characters, and the handoff has 10 sections.">
+        <svg class="wires" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><path d="M20 60 H980"/><path class="glow" d="M20 60 H980"/></svg>
+        <div class="stage"><span class="count" data-to="102">0</span><b>Session</b><span class="meta">transcript records, 18 tool calls, git state</span></div>
+        <div class="stage"><span class="count" data-to="37">0</span><b>Discover</b><span class="meta">typed candidates: messages, attempts, verifications, files</span></div>
+        <div class="stage"><span class="count" data-to="24">0</span><b>Select</b><span class="meta">scored, budgeted, secrets redacted</span></div>
+        <div class="stage"><span class="count" data-to="25891" data-fmt="k">0</span><b>Compile</b><span class="meta">characters to an isolated <code>claude -p</code>, no tools</span></div>
+        <div class="stage lit"><span class="count" data-to="10">0</span><b>Handoff</b><span class="meta">sections the next agent can act on</span></div>
+      </div>
+      <p class="note">Counts from one real session (a JWT key-rotation task), measured without a model call.</p>
+    </div>
+  </section>
+
+  <!-- The handoff: explore a real one -->
+  <section class="section handoff" id="handoff">
+    <div class="wrap">
+      <h2 class="h2 split">A real handoff, not a summary.</h2>
+      <p class="sub">Fixed sections make gaps visible. Every fact keeps its source, and what the session never established is reported as unknown instead of guessed.</p>
+      <div class="explorer">
+        <div class="tabs" role="tablist" aria-label="Handoff sections"></div>
+        <div class="doc" role="tabpanel" aria-live="polite">
+          <div class="doc-bar"><i></i><i></i><i></i><span>ccp --handoff</span></div>
+          <div class="doc-body"><h3 class="doc-title"></h3><p class="doc-note"></p><ul class="doc-lines"></ul></div>
+        </div>
+      </div>
+      <p class="note">Excerpt from a real <code>ccp --handoff</code> output, v7, on a recorded session.</p>
+    </div>
+  </section>
+
+  <!-- Commands -->
+  <section class="section commands" id="commands">
+    <div class="wrap two">
+      <div>
+        <h2 class="h2 split">Four commands you will use.</h2>
+        <p class="sub">Run them in the project you were working on with Claude Code. Output is copied to your clipboard, ready to paste into the next agent.</p>
+      </div>
+      <ul class="term" aria-label="Commands">
+        <li><code><span class="p">$</span> ccp --handoff</code><span>Write a brief for a fresh agent that lacks the conversation.</span></li>
+        <li><code><span class="p">$</span> ccp --recover</code><span>Rebuild the task state after compaction or an interruption.</span></li>
+        <li><code><span class="p">$</span> ccp "fix the auth issue"</code><span>Compile a short instruction against the current session.</span></li>
+        <li><code><span class="p">$</span> ccp context</code><span>See everything it discovered. Nothing is sent anywhere.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Safety -->
+  <section class="section safety" id="safety">
+    <div class="wrap">
+      <h2 class="h2 split">Private by construction.</h2>
+      <div class="rules">
+        <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/></svg><h3>Your own Claude account</h3><p>Compilation runs through your signed-in <code>claude</code> CLI. ccp never reads your credentials.</p></div>
+        <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 12h6"/></svg><h3>An isolated compile call</h3><p>A throwaway directory, no tools, no MCP servers, no hooks, no session history. It reads and answers, nothing else.</p></div>
+        <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M4 7h10M4 17h7"/><path d="M17 15l4 4M21 15l-4 4"/></svg><h3>Secrets redacted first</h3><p>API keys, tokens and private keys are removed before anything leaves your machine.</p></div>
+        <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5M12 16v.5"/></svg><h3>Untrusted stays untrusted</h3><p>Text from files, tool output and pasted content is treated as data, never as instructions.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Film -->
+  <section class="section film" id="film">
+    <div class="wrap">
+      <h2 class="h2 split">Forty seconds, one idea.</h2>
+      <div class="player">
+        <video id="video" src="media/film.mp4" poster="media/poster.jpg" preload="none" playsinline controls></video>
+        <button type="button" class="play" aria-label="Play the film"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing CTA -->
+  <section class="section cta" id="install">
+    <div class="wrap center">
+      <img class="mascot" src="media/icon.png" alt="" width="120" height="120">
+      <h2 class="h1 split">Leave a map for the next agent.</h2>
+      <p class="sub">Requires macOS, Node.js 22 or later, and the Claude Code CLI, signed in.</p>
+      <div class="install big" data-copy="npm install -g --install-links github:swethankreddy/context-compiler">
+        <span class="prompt">$</span><code class="cmd">npm install -g --install-links github:swethankreddy/context-compiler</code>
+        <button type="button" class="copy" aria-label="Copy install command">Copy</button>
+      </div>
+      <div class="actions center">
+        <a class="btn primary" href="https://github.com/swethankreddy/context-compiler">Star on GitHub</a>
+        <a class="btn ghost" href="https://swethank-ledger.vercel.app/n/014-context-compiler">Read the story</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap row">
+    <a class="by" href="https://swethank-ledger.vercel.app/"><img src="media/swethank.jpg" alt="" width="40" height="40"><span>Built by <b>Swethank</b></span></a>
+    <p>MIT licensed. Not affiliated with Anthropic.</p>
+  </div>
+</footer>
+</body>
+</html>
