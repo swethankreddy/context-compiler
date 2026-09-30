@@ -3,6 +3,9 @@
 @font-face { font-family: "Inter"; font-weight: 500; font-display: swap; src: url("fonts/inter-latin-500-normal.woff2") format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 600; font-display: swap; src: url("fonts/inter-latin-600-normal.woff2") format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url("fonts/inter-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Newsreader"; font-weight: 400; font-display: swap; src: url("fonts/newsreader-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Newsreader"; font-weight: 500; font-display: swap; src: url("fonts/newsreader-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Newsreader"; font-weight: 400; font-style: italic; font-display: swap; src: url("fonts/newsreader-latin-400-italic.woff2") format("woff2"); }
 @font-face { font-family: "Geist Mono"; font-weight: 400; font-display: swap; src: url("fonts/GeistMono-Regular.woff2") format("woff2"); }
 @font-face { font-family: "Geist Mono"; font-weight: 500; font-display: swap; src: url("fonts/GeistMono-Medium.woff2") format("woff2"); }
 
@@ -181,3 +184,38 @@ main, .foot, .nav { position: relative; z-index: 1; }
   .beat { position: static; opacity: 1; }
   .progress { display: none; }
 }
+
+/* ---- Typography: serif display (the ledger's Newsreader), Inter for reading and interface ---------------------- */
+:root { --serif: "Newsreader", "Iowan Old Style", Georgia, serif; }
+body { text-rendering: optimizeLegibility; font-feature-settings: "kern", "liga", "calt"; }
+.kicker { padding: 0; border: 0; background: none; backdrop-filter: none; gap: 14px; font-size: 15px; font-weight: 500; letter-spacing: 0.005em; color: var(--ink-2); }
+.kicker .dot { width: 28px; height: 1.5px; border-radius: 1px; box-shadow: none; }
+.hero h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(54px, 8.8vw, 140px); letter-spacing: -0.028em; line-height: 0.94; max-width: 11.5ch; margin-top: 30px; }
+.lede { font-size: clamp(19px, 1.45vw, 22px); line-height: 1.6; max-width: 31em; margin-top: 30px; }
+.lede code { font-size: 0.86em; }
+.beat .n { font-family: "Inter", sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.beat h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(42px, 5.4vw, 84px); letter-spacing: -0.025em; line-height: 1; }
+.beat p { font-size: clamp(18px, 1.35vw, 21px); line-height: 1.6; max-width: 30em; }
+.h1, .h2 { font-family: var(--serif); font-weight: 500; letter-spacing: -0.025em; line-height: 1; }
+.h1 { font-size: clamp(46px, 6.6vw, 104px); }
+.h2 { font-size: clamp(40px, 5vw, 76px); max-width: 13ch; }
+.head { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 80px); align-items: end; padding-bottom: clamp(28px, 3vw, 40px); border-bottom: 1px solid var(--rule); }
+.head .sub { margin: 0; padding-bottom: 0.35em; }
+@media (max-width: 860px) { .head { grid-template-columns: 1fr; } .head .sub { margin-top: 4px; } }
+.sub { font-size: clamp(18px, 1.3vw, 20px); line-height: 1.6; max-width: 30em; }
+.note { font-size: 14px; line-height: 1.5; letter-spacing: 0.005em; }
+.pipeline { margin-top: 64px; }
+.stage .count { font-family: var(--serif); font-weight: 400; font-size: clamp(46px, 4.6vw, 76px); letter-spacing: -0.02em; font-variant-numeric: lining-nums tabular-nums; }
+.stage b { margin-top: 18px; font-size: 17px; font-weight: 600; letter-spacing: -0.005em; }
+.stage .meta { font-size: 15px; line-height: 1.55; }
+.wires { top: 44px; }
+.explorer { margin-top: 56px; }
+.tab { font-size: 15.5px; }
+.rules { margin-top: 56px; }
+.rule h3 { font-size: 19px; letter-spacing: -0.012em; }
+.rule p { font-size: 16px; line-height: 1.6; }
+.term span { font-size: 16px; line-height: 1.5; }
+.btn { font-weight: 500; font-size: 15.5px; letter-spacing: 0; padding: 14px 24px; }
+.cta .h1 { max-width: 13ch; }
+.cta .sub { max-width: 32em; }
+.player { margin-top: 48px; }

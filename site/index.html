@@ -68,8 +68,8 @@
   <!-- How it works: the pipeline with real counts -->
   <section class="section how" id="how">
     <div class="wrap">
-      <h2 class="h2 split">Deterministic until the last step.</h2>
-      <p class="sub">The model only writes. Finding, scoring and trimming the evidence is plain code you can inspect with <code>ccp context</code>.</p>
+      <div class="head"><h2 class="h2 split">Deterministic until the last step.</h2>
+      <p class="sub">The model only writes. Finding, scoring and trimming the evidence is plain code you can inspect with <code>ccp context</code>.</p></div>
       <div class="pipeline" role="img" aria-label="On one recorded session: 102 transcript records and 18 tool calls were discovered as 37 candidates, 24 were selected within the budget and redacted, the isolated compile call read 25,891 characters, and the handoff has 10 sections.">
         <svg class="wires" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><path d="M20 60 H980"/><path class="glow" d="M20 60 H980"/></svg>
         <div class="stage"><span class="count" data-to="102">0</span><b>Session</b><span class="meta">transcript records, 18 tool calls, git state</span></div>
@@ -85,8 +85,8 @@
   <!-- The handoff: explore a real one -->
   <section class="section handoff" id="handoff">
     <div class="wrap">
-      <h2 class="h2 split">A real handoff, not a summary.</h2>
-      <p class="sub">Fixed sections make gaps visible. Every fact keeps its source, and what the session never established is reported as unknown instead of guessed.</p>
+      <div class="head"><h2 class="h2 split">A real handoff, not a summary.</h2>
+      <p class="sub">Fixed sections make gaps visible. Every fact keeps its source, and what the session never established is reported as unknown instead of guessed.</p></div>
       <div class="explorer">
         <div class="tabs" role="tablist" aria-label="Handoff sections"></div>
         <div class="doc" role="tabpanel" aria-live="polite">
@@ -117,7 +117,7 @@
   <!-- Safety -->
   <section class="section safety" id="safety">
     <div class="wrap">
-      <h2 class="h2 split">Private by construction.</h2>
+      <div class="head"><h2 class="h2 split">Private by construction.</h2></div>
       <div class="rules">
         <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/></svg><h3>Your own Claude account</h3><p>Compilation runs through your signed-in <code>claude</code> CLI. ccp never reads your credentials.</p></div>
         <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 12h6"/></svg><h3>An isolated compile call</h3><p>A throwaway directory, no tools, no MCP servers, no hooks, no session history. It reads and answers, nothing else.</p></div>
@@ -130,7 +130,7 @@
   <!-- Film -->
   <section class="section film" id="film">
     <div class="wrap">
-      <h2 class="h2 split">Forty seconds, one idea.</h2>
+      <div class="head"><h2 class="h2 split">Forty seconds, one idea.</h2></div>
       <div class="player">
         <video id="video" src="media/film.mp4" poster="media/poster.jpg" preload="none" playsinline controls></video>
         <button type="button" class="play" aria-label="Play the film"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button>

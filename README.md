@@ -15,7 +15,7 @@
   <a href="https://github.com/swethankreddy/context-compiler/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/swethankreddy/context-compiler/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-DAEE4C.svg"></a>
   <img alt="Node.js 22+" src="https://img.shields.io/badge/node-%3E%3D22-63A98A.svg">
-  <a href="https://swethankreddy.github.io/context-compiler/"><img alt="Website" src="https://img.shields.io/badge/website-context--compiler-DAEE4C.svg"></a>
+  <a href="https://swethank-ledger.vercel.app/context-compiler"><img alt="Website" src="https://img.shields.io/badge/website-context--compiler-DAEE4C.svg"></a>
   <a href="https://github.com/swethankreddy/context-compiler/releases/latest"><img alt="Watch the film" src="https://img.shields.io/badge/watch-the%20film-17191B.svg"></a>
 </p>
 
